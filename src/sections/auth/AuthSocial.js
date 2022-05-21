@@ -5,6 +5,11 @@ import Iconify from '../../components/Iconify';
 
 // ----------------------------------------------------------------------
 
+
+const handleGoogleOauth = () => {
+
+};
+
 export default function AuthSocial() {
   return (
     <>
