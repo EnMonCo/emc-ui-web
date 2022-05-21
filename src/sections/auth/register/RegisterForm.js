@@ -1,25 +1,24 @@
 import * as Yup from 'yup';
 import { useState } from 'react';
 import { useFormik, Form, FormikProvider } from 'formik';
-import { useNavigate } from 'react-router-dom';
+import superagent from 'superagent';
 // material
-import { Stack, TextField, IconButton, InputAdornment } from '@mui/material';
+import { Stack, TextField, IconButton, InputAdornment, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // component
 import Iconify from '../../../components/Iconify';
+import { EMC_ACCOUNTS_V1 } from '../../../config';
 
 // ----------------------------------------------------------------------
 
 export default function RegisterForm() {
-  const navigate = useNavigate();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const RegisterSchema = Yup.object().shape({
     firstName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('First name required'),
     lastName: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Last name required'),
     email: Yup.string().email('Email must be a valid email address').required('Email is required'),
-    password: Yup.string().required('Password is required'),
+    password: Yup.string().min(6, 'Too Short!').required('Password is required'),
   });
 
   const formik = useFormik({
@@ -29,13 +28,42 @@ export default function RegisterForm() {
       email: '',
       password: '',
     },
+    initialStatus: {
+      success: false,
+    },
     validationSchema: RegisterSchema,
-    onSubmit: () => {
-      navigate('/dashboard', { replace: true });
+    onSubmit: async (values, formikHelpers) => {
+      try {
+        await superagent
+          .post(`${EMC_ACCOUNTS_V1}/auth/email/register`)
+          .send(values);
+
+        formikHelpers.setSubmitting(false);
+
+        formikHelpers.setStatus({ success: true });
+      } catch (error) {
+        if (error.status === 422) {
+          const {errors} = error.response.body;
+          if (errors.email === 'emailAlreadyExists') {
+            formikHelpers.setFieldError('email', 'Email already exists. Try logging in instead.');
+          }
+        }
+      }
     },
   });
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
+
+  if (formik.status.success) {
+    return (
+      <Stack alignItems='center'>
+        <Iconify icon="eva:checkmark-circle-2-outline" sx={{ width: 160, height: 160, color: 'green' }} />
+        <Typography variant="h4" textAlign='center'>
+          Success! Check your email to verify your account.
+        </Typography>
+      </Stack>
+    )
+  }
 
   return (
     <FormikProvider value={formik}>

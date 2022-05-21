@@ -33,7 +33,6 @@ export default function LoginForm() {
     },
     validationSchema: LoginSchema,
     onSubmit: async (values, formikHelpers) => {
-
       try {
         const response = await superagent
           .post(`${EMC_ACCOUNTS_V1}/auth/email/login`)

@@ -12,6 +12,7 @@ import Register from './pages/Register';
 import Products from './pages/Products';
 import DashboardApp from './pages/DashboardApp';
 import RequireAuth from "./components/RequireAuth";
+import ConfirmEmail from './pages/ConfirmEmail';
 
 // ----------------------------------------------------------------------
 
@@ -23,6 +24,11 @@ export default function Router() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="oauth-callback" element={<Typography>Logging you in...</Typography>} />
+        {/* <Route path="confirm-email" element={<Navigate to="/404" />}> */}
+        {/*  <Route path=":hash" element={<ConfirmEmail />}/> */}
+        {/* </Route> */}
+
+        <Route path="confirm-email/:hash" element={<ConfirmEmail />}/>
         <Route path="404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" />} />
       </Route>
