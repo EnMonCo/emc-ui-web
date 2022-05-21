@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Card, Link, Container, Typography } from '@mui/material';
+import { Card, Link, Container, Typography, Divider } from '@mui/material';
 // hooks
 import useResponsive from '../hooks/useResponsive';
 // components
@@ -94,6 +94,12 @@ export default function Register() {
             <Typography sx={{ color: 'text.secondary', mb: 5 }}>Free forever. No credit card needed.</Typography>
 
             <AuthSocial />
+
+            <Divider sx={{ my: 3 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                OR
+              </Typography>
+            </Divider>
 
             <RegisterForm />
 

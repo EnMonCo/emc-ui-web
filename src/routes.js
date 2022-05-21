@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 // layouts
+import { Typography } from '@mui/material';
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 //
@@ -21,6 +22,7 @@ export default function Router() {
         <Route index element={<Navigate to="/dashboard/app" />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="oauth-callback" element={<Typography>Logging you in...</Typography>} />
         <Route path="404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" />} />
       </Route>

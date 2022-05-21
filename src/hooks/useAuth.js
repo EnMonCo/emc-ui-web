@@ -57,13 +57,22 @@ export function AuthProvider(props) {
       const credentials = JSON.parse(localStorage.user);
       const user = credentials ? new User({
         id: +credentials.id,
-        username: String(credentials.username),
+        firstName: String(credentials.firstName),
+        lastName: String(credentials.lastName),
         email: String(credentials.email),
         deletedAt: new Date(credentials.deletedAt),
         createdAt: new Date(credentials.createdAt),
         updatedAt: new Date(credentials.updatedAt),
-        photo: String(credentials.photo),
-        bearerToken: String(credentials.bearerToken)
+        photo: credentials.photo ? String(credentials.photo) : undefined,
+        bearerToken: String(credentials.bearerToken),
+        role: {
+          id: +credentials.role.id,
+          name: String(credentials.role.name),
+        },
+        status: {
+          id: +credentials.status.id,
+          name: String(credentials.status.name),
+        },
       }) : null;
       if (user && !user.id) {
         logout();
@@ -76,6 +85,11 @@ export function AuthProvider(props) {
     return null;
   }
 
+  /**
+   * getUser - Get user from context.
+   * @function
+   * @returns {User} - User.
+   */
   function getUser() {
     if (!user) {
       logout();
@@ -118,5 +132,8 @@ AuthProvider.propTypes = {
  *     );
  * }
  */
-const useAuth = () => React.useContext(Context);
+const useAuth = () => {
+  // TODO: if token expired - logout
+  return React.useContext(Context);
+}
 export default useAuth;
