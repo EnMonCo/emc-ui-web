@@ -32,19 +32,25 @@ export function AuthProvider(props) {
 
   React.useEffect(() => {
     const localStorageUser = getUserFromLocalStorage();
-    superagent
-      .get(`${EMC_ACCOUNTS_V1}/auth/me`)
-      .set(`Authorization`, `Bearer ${localStorageUser.bearerToken}`)
-      .then((res) => {
-        if (res.body.updatedAt === localStorageUser.updatedAt) {
-          setUser(localStorageUser);
-          setLogged(true);
-        } else {
-          const user = new User({...res.body, bearerToken: localStorageUser.bearerToken});
-          login(user)
-        }
-        setLoaded(true);
-      })
+    if (localStorageUser) {
+      superagent
+        .get(`${EMC_ACCOUNTS_V1}/auth/me`)
+        .set(`Authorization`, `Bearer ${localStorageUser.bearerToken}`)
+        .then((res) => {
+          if (res.body.updatedAt === localStorageUser.updatedAt) {
+            setUser(localStorageUser);
+            setLogged(true);
+          } else {
+            const user = new User({ ...res.body, bearerToken: localStorageUser.bearerToken });
+            login(user)
+          }
+          setLoaded(true);
+        })
+    } else {
+      setUser(null);
+      setLogged(false);
+      setLoaded(true);
+    }
 
   }, []);
 

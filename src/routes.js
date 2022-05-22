@@ -4,15 +4,15 @@ import { Typography } from '@mui/material';
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 //
-
 import User from './pages/User';
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import DashboardApp from './pages/DashboardApp';
-import RequireAuth from "./components/RequireAuth";
+import RequireAuth from './components/RequireAuth';
 import ConfirmEmail from './pages/ConfirmEmail';
+import PairMeter from './pages/PairMeter';
 
 // ----------------------------------------------------------------------
 
@@ -28,15 +28,26 @@ export default function Router() {
         {/*  <Route path=":hash" element={<ConfirmEmail />}/> */}
         {/* </Route> */}
 
-        <Route path="confirm-email/:hash" element={<ConfirmEmail />}/>
+        <Route path="confirm-email/:hash" element={<ConfirmEmail />} />
+        <Route
+          path="pair/:hash"
+          element={
+            <RequireAuth>
+              <PairMeter />
+            </RequireAuth>
+          }
+        />
         <Route path="404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" />} />
       </Route>
-      <Route path="/dashboard" element={
-        <RequireAuth>
-          <DashboardLayout />
-        </RequireAuth>
-      }>
+      <Route
+        path="/dashboard"
+        element={
+          <RequireAuth>
+            <DashboardLayout />
+          </RequireAuth>
+        }
+      >
         <Route path="app" element={<DashboardApp />} />
         <Route path="user" element={<User />} />
         <Route path="settings" element={<Settings />} />

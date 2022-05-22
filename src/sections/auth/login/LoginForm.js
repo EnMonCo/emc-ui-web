@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import superagent from 'superagent';
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { useFormik, Form, FormikProvider } from 'formik';
 // material
 import { Link, Stack, Checkbox, TextField, IconButton, InputAdornment, FormControlLabel } from '@mui/material';
@@ -16,6 +16,7 @@ import useAuth from '../../../hooks/useAuth';
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const {login} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +46,12 @@ export default function LoginForm() {
 
         formikHelpers.setSubmitting(false);
 
-        navigate('/dashboard/app', { replace: true });
+        console.log(location);
+        if (location.state && location.state.from) {
+          navigate(location.state.from);
+        } else {
+          navigate('/dashboard/app', { replace: true });
+        }
       } catch (error) {
         if (error.status === 422) {
           formikHelpers.setFieldError('password', 'Invalid password');
