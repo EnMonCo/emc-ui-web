@@ -4,12 +4,12 @@ import { Typography } from '@mui/material';
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 //
-import Blog from './pages/Blog';
+
 import User from './pages/User';
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
-import Products from './pages/Products';
+import Settings from './pages/Settings';
 import DashboardApp from './pages/DashboardApp';
 import RequireAuth from "./components/RequireAuth";
 import ConfirmEmail from './pages/ConfirmEmail';
@@ -39,8 +39,7 @@ export default function Router() {
       }>
         <Route path="app" element={<DashboardApp />} />
         <Route path="user" element={<User />} />
-        <Route path="products" element={<Products />} />
-        <Route path="blog" element={<Blog />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>
   );
