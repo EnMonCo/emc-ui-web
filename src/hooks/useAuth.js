@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import superagent from 'superagent';
 import User from '../entities/User';
+import { EMC_ACCOUNTS_V1 } from '../config';
 
 const Context = React.createContext({
   getUser() {
@@ -30,9 +32,20 @@ export function AuthProvider(props) {
 
   React.useEffect(() => {
     const localStorageUser = getUserFromLocalStorage();
-    setUser(localStorageUser);
-    setLogged(!!localStorageUser);
-    setLoaded(true);
+    superagent
+      .get(`${EMC_ACCOUNTS_V1}/auth/me`)
+      .set(`Authorization`, `Bearer ${localStorageUser.bearerToken}`)
+      .then((res) => {
+        if (res.body.updatedAt === localStorageUser.updatedAt) {
+          setUser(localStorageUser);
+          setLogged(true);
+        } else {
+          const user = new User({...res.body, bearerToken: localStorageUser.bearerToken});
+          login(user)
+        }
+        setLoaded(true);
+      })
+
   }, []);
 
   React.useEffect(() => {
@@ -132,8 +145,5 @@ AuthProvider.propTypes = {
  *     );
  * }
  */
-const useAuth = () => {
-  // TODO: if token expired - logout
-  return React.useContext(Context);
-}
+const useAuth = () => React.useContext(Context)
 export default useAuth;
