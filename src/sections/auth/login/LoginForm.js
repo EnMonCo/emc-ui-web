@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import superagent from 'superagent';
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useFormik, Form, FormikProvider } from 'formik';
@@ -7,11 +8,15 @@ import { Link, Stack, Checkbox, TextField, IconButton, InputAdornment, FormContr
 import { LoadingButton } from '@mui/lab';
 // component
 import Iconify from '../../../components/Iconify';
+import { EMC_ACCOUNTS_V1 } from '../../../config';
+import User from '../../../entities/User';
+import useAuth from '../../../hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const {login} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -27,8 +32,25 @@ export default function LoginForm() {
       remember: true,
     },
     validationSchema: LoginSchema,
-    onSubmit: () => {
-      navigate('/dashboard', { replace: true });
+    onSubmit: async (values, formikHelpers) => {
+      try {
+        const response = await superagent
+          .post(`${EMC_ACCOUNTS_V1}/auth/email/login`)
+          .send(values);
+
+
+        const user = new User({...response.body.user, bearerToken: response.body.token});
+
+        login(user);
+
+        formikHelpers.setSubmitting(false);
+
+        navigate('/dashboard/app', { replace: true });
+      } catch (error) {
+        if (error.status === 422) {
+          formikHelpers.setFieldError('password', 'Invalid password');
+        }
+      }
     },
   });
 
