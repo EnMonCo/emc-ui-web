@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Link, Drawer, Typography, Avatar  } from '@mui/material';
+import { Avatar, Box, Drawer, Link, Typography } from '@mui/material';
 // hooks
 import useResponsive from '../../hooks/useResponsive';
 import useAuth from '../../hooks/useAuth';
@@ -12,7 +12,8 @@ import Logo from '../../components/Logo';
 import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
 //
-import navConfig from './NavConfig';
+import userNavConfig from './NavConfig';
+import adminNavConfig from './AdminNavConfig';
 
 // ----------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
   const { pathname } = useLocation();
   const isDesktop = useResponsive('up', 'lg');
 
-  const {getUser} = useAuth();
+  const { getUser } = useAuth();
 
   const user = getUser();
 
@@ -54,6 +55,8 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  const navConfig = user.role.id === 1 ? adminNavConfig : userNavConfig;
 
   const renderContent = (
     <Scrollbar

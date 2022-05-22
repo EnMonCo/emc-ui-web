@@ -46,7 +46,6 @@ export default function LoginForm() {
 
         formikHelpers.setSubmitting(false);
 
-        console.log(location);
         if (location.state && location.state.from) {
           navigate(location.state.from);
         } else {

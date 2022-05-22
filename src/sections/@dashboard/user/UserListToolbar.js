@@ -63,9 +63,9 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
+        <Tooltip title="Suspend">
           <IconButton>
-            <Iconify icon="eva:trash-2-fill" />
+            <Iconify icon="eva:person-delete-fill" />
           </IconButton>
         </Tooltip>
       ) : (

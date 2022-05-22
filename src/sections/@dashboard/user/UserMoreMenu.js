@@ -29,16 +29,23 @@ export default function UserMoreMenu() {
       >
         <MenuItem sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
-            <Iconify icon="eva:trash-2-outline" width={24} height={24} />
+            <Iconify icon="eva:search-fill" width={24} height={24} />
           </ListItemIcon>
-          <ListItemText primary="Delete" primaryTypographyProps={{ variant: 'body2' }} />
+          <ListItemText primary="View" primaryTypographyProps={{ variant: 'body2' }} />
         </MenuItem>
 
         <MenuItem component={RouterLink} to="#" sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
-            <Iconify icon="eva:edit-fill" width={24} height={24} />
+            <Iconify icon="eva:file-text-outline" width={24} height={24} />
           </ListItemIcon>
-          <ListItemText primary="Edit" primaryTypographyProps={{ variant: 'body2' }} />
+          <ListItemText primary="Report" primaryTypographyProps={{ variant: 'body2' }} />
+        </MenuItem>
+
+        <MenuItem component={RouterLink} to="#" sx={{ color: 'text.secondary' }}>
+          <ListItemIcon>
+            <Iconify icon="eva:person-delete-fill" width={24} height={24} />
+          </ListItemIcon>
+          <ListItemText primary="Suspend" primaryTypographyProps={{ variant: 'body2' }} />
         </MenuItem>
       </Menu>
     </>

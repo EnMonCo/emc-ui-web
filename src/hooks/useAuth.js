@@ -9,10 +9,8 @@ const Context = React.createContext({
     return null;
   },
   isLogged: false,
-  login(user) {
-  },
-  logout() {
-  },
+  login(user) {},
+  logout() {},
 });
 
 export const displayName = "AuthProvider";
@@ -37,11 +35,11 @@ export function AuthProvider(props) {
         .get(`${EMC_ACCOUNTS_V1}/auth/me`)
         .set(`Authorization`, `Bearer ${localStorageUser.bearerToken}`)
         .then((res) => {
+          const user = new User({ ...res.body, bearerToken: localStorageUser.bearerToken });
           if (res.body.updatedAt === localStorageUser.updatedAt) {
-            setUser(localStorageUser);
+            setUser(user);
             setLogged(true);
           } else {
-            const user = new User({ ...res.body, bearerToken: localStorageUser.bearerToken });
             login(user)
           }
           setLoaded(true);
@@ -107,7 +105,7 @@ export function AuthProvider(props) {
   /**
    * getUser - Get user from context.
    * @function
-   * @returns {User} - User.
+   * @returns {User} - Users.
    */
   function getUser() {
     if (!user) {
