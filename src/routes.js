@@ -14,6 +14,7 @@ import DashboardApp from './pages/DashboardApp';
 import RequireAuth from './components/RequireAuth';
 import ConfirmEmail from './pages/ConfirmEmail';
 import PairMeter from './pages/PairMeter';
+import Meters from './pages/Meters';
 import RequireAdmin from './components/RequireAdmin';
 
 // ----------------------------------------------------------------------
@@ -68,6 +69,7 @@ export default function Router() {
           }
         />
         <Route path="settings" element={<Settings />} />
+        <Route path="meters" element={<Meters />} />
       </Route>
     </Routes>
   );

@@ -1,27 +1,92 @@
 import { faker } from '@faker-js/faker';
+import { useEffect, useState } from 'react';
+import superagent from 'superagent';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+import { Container, Grid, Typography } from '@mui/material';
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
 // sections
 import {
-  AppTasks,
+  AppConversionRates,
+  AppCurrentSubject,
+  AppCurrentVisits,
   AppNewsUpdate,
   AppOrderTimeline,
-  AppCurrentVisits,
-  AppWebsiteVisits,
+  AppTasks,
   AppTrafficBySite,
+  AppWebsiteVisits,
   AppWidgetSummary,
-  AppCurrentSubject,
-  AppConversionRates,
 } from '../sections/@dashboard/app';
+
+import { EMC_METERS_V1 } from '../config';
+import useAuth from '../hooks/useAuth';
+
 
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
   const theme = useTheme();
+
+  const [meters, setMeters] = useState([]);
+
+  const { getUser } = useAuth();
+
+  const [voltage, setVoltage] = useState(0.0);
+  const [power, setPower] = useState(0.0);
+
+  const user = getUser();
+
+  useEffect(() => {
+    superagent
+      .get(`${EMC_METERS_V1}/users/${user.id}/meters`)
+      .set('Authorization', `Bearer ${user.bearerToken}`)
+      .then((res) => {
+        setMeters(res.body.data);
+        fetchMeterData();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [user.bearerToken]);
+
+  const fetchMeterData = () => {
+    if(meters.length) {
+      superagent
+        .get(`${EMC_METERS_V1}/meters/${meters[0].id}/data/live`)
+        .set('Authorization', `Bearer ${user.bearerToken}`)
+        .then((res) => {
+          setVoltage(res.body[0].voltage);
+          setPower(res.body[0].power);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }
+
+  setInterval(fetchMeterData, 1000 * 10);
+
+
+  // useEffect(() => {
+  //   superagent
+  //     .get(`${EMC_METERS_V1_V1}/users`)
+  //     .query({
+  //       page: page + 1,
+  //       limit: rowsPerPage,
+  //     })
+  //     .set('Authorization', `Bearer ${admin.bearerToken}`)
+  //     .then((res) => {
+  //       setUsers(res.body.data);
+  //       setTotal(res.body.totalCount);
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       setLoading(false);
+  //     });
+  // }, [rowsPerPage, page, admin.bearerToken]);
 
   return (
     <Page title="Dashboard">
@@ -32,20 +97,13 @@ export default function DashboardApp() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+            <AppWidgetSummary title="Voltage" total={voltage} color={voltage > 240 ? "error" : "info"} icon={'eva:activity-outline'} />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+            <AppWidgetSummary title="Power" total={power} color={power > 0.5 ? "error" : "info"} icon={'eva:flash-outline'} />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid>
 
           <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
