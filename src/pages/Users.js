@@ -113,8 +113,6 @@ export default function Users() {
       });
   }, [rowsPerPage, page, admin.bearerToken]);
 
-  console.log(users);
-
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -230,7 +228,7 @@ export default function Users() {
                           </TableCell>
 
                           <TableCell align="right">
-                            <UserMoreMenu />
+                            <UserMoreMenu user={row} />
                           </TableCell>
                         </TableRow>
                       );

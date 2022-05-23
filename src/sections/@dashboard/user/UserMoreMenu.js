@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 // material
 import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
 // component
@@ -7,7 +8,7 @@ import Iconify from '../../../components/Iconify';
 
 // ----------------------------------------------------------------------
 
-export default function UserMoreMenu() {
+export default function UserMoreMenu({ user }) {
   const ref = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,7 +28,7 @@ export default function UserMoreMenu() {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem sx={{ color: 'text.secondary' }}>
+        <MenuItem component={RouterLink} to={`/dashboard/users/${user.id}`} sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
             <Iconify icon="eva:search-fill" width={24} height={24} />
           </ListItemIcon>
@@ -51,3 +52,7 @@ export default function UserMoreMenu() {
     </>
   );
 }
+
+UserMoreMenu.propTypes = {
+  user: PropTypes.object.isRequired,
+};

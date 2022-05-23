@@ -44,6 +44,11 @@ export function AuthProvider(props) {
           }
           setLoaded(true);
         })
+        .catch((e) => {
+          console.error(e);
+          logout();
+          setLoaded(true);
+        });
     } else {
       setUser(null);
       setLogged(false);

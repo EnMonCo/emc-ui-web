@@ -3,8 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Typography } from '@mui/material';
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
-//
+// pages
 import Users from './pages/Users';
+import User from './pages/User';
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
@@ -51,10 +52,18 @@ export default function Router() {
       >
         <Route path="app" element={<DashboardApp />} />
         <Route
-          path="user"
+          path="users"
           element={
             <RequireAdmin>
               <Users />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="users/:id"
+          element={
+            <RequireAdmin>
+              <User />
             </RequireAdmin>
           }
         />
