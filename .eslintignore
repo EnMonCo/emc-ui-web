@@ -1,4 +1,5 @@
 // .eslintignore
+.eslintrc
 build/*
 public/*
 src/service-worker.js

@@ -27,7 +27,7 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
       y: {
         formatter: (y) => {
           if (typeof y !== 'undefined') {
-            return `${y.toFixed(0)} V`;
+            return `${y.toFixed(0)} kWh`;
           }
           return y;
         },

@@ -17,6 +17,11 @@ const navConfig = [
     icon: getIcon('eva:people-fill'),
   },
   {
+    title: 'meters',
+    path: '/dashboard/meters',
+    icon: getIcon('eva:people-fill'),
+  },
+  {
     title: 'login',
     path: '/login',
     icon: getIcon('eva:lock-fill'),
