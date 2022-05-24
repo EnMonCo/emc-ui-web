@@ -1,28 +1,15 @@
-import { faker } from '@faker-js/faker';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import superagent from 'superagent';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Container, Grid, Typography } from '@mui/material';
 // components
 import Page from '../components/Page';
-import Iconify from '../components/Iconify';
 // sections
-import {
-  AppConversionRates,
-  AppCurrentSubject,
-  AppCurrentVisits,
-  AppNewsUpdate,
-  AppOrderTimeline,
-  AppTasks,
-  AppTrafficBySite,
-  AppWebsiteVisits,
-  AppWidgetSummary,
-} from '../sections/@dashboard/app';
+import { AppWebsiteVisits, AppWidgetSummary } from '../sections/@dashboard/app';
 
 import { EMC_METERS_V1 } from '../config';
 import useAuth from '../hooks/useAuth';
-
 
 // ----------------------------------------------------------------------
 
@@ -35,24 +22,12 @@ export default function DashboardApp() {
 
   const [voltage, setVoltage] = useState(0.0);
   const [power, setPower] = useState(0.0);
+  const [activeMeter, setActiveMeter] = useState(null);
 
   const user = getUser();
 
-  useEffect(() => {
-    superagent
-      .get(`${EMC_METERS_V1}/users/${user.id}/meters`)
-      .set('Authorization', `Bearer ${user.bearerToken}`)
-      .then((res) => {
-        setMeters(res.body.data);
-        fetchMeterData(res.body.data[0].id);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, [user.bearerToken]);
-
   const fetchMeterData = (id) => {
-    if(id) {
+    if (id) {
       superagent
         .get(`${EMC_METERS_V1}/meters/${id}/data/live`)
         .set('Authorization', `Bearer ${user.bearerToken}`)
@@ -64,16 +39,36 @@ export default function DashboardApp() {
           console.error(err);
         });
     }
-  }
+  };
 
-  setInterval(()=>{
-    if(meters.length)
-    {
-      fetchMeterData(meters[0].id);
+  useEffect(() => {
+    superagent
+      .get(`${EMC_METERS_V1}/users/${user.id}/meters`)
+      .set('Authorization', `Bearer ${user.bearerToken}`)
+      .then((res) => {
+        setMeters(res.body.data);
+        setActiveMeter(res.body.data[0]);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [user]);
+
+  const intervalHandle = useRef(null);
+
+  useEffect(() => {
+    if (activeMeter) {
+      console.log('set interval');
+      fetchMeterData(activeMeter.id);
+      intervalHandle.current = setInterval(() => {
+        fetchMeterData(activeMeter.id);
+      }, 1000 * 10);
     }
-  }, 1000 * 10);
 
-
+    return () => {
+      clearInterval(intervalHandle.current);
+    };
+  }, [activeMeter]);
 
   return (
     <Page title="Dashboard">
@@ -84,13 +79,22 @@ export default function DashboardApp() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Voltage" total={voltage} color={voltage > 240 ? "error" : "info"} icon={'eva:activity-outline'} />
+            <AppWidgetSummary
+              title="Voltage, V"
+              total={voltage}
+              color={voltage > 240 ? 'error' : 'info'}
+              icon={'eva:activity-outline'}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Power" total={power} color={power > 0.5 ? "error" : "info"} icon={'eva:flash-outline'} />
+            <AppWidgetSummary
+              title="Power, kW/h"
+              total={power}
+              color={power > 0.5 ? 'error' : 'info'}
+              icon={'eva:flash-outline'}
+            />
           </Grid>
-
 
           <Grid item xs={12} md={12} lg={12}>
             <AppWebsiteVisits
@@ -114,8 +118,8 @@ export default function DashboardApp() {
                   name: 'voltage',
                   type: 'area',
                   fill: 'gradient',
-                  data: [230, 185, 220, 226, 189, 220, 208, 218, 224, 198, 228]
-                }
+                  data: [230, 185, 220, 226, 189, 220, 208, 218, 224, 198, 228],
+                },
               ]}
             />
           </Grid>
@@ -142,12 +146,11 @@ export default function DashboardApp() {
                   name: 'voltage',
                   type: 'area',
                   fill: 'gradient',
-                  data: [230, 185, 220, 226, 189, 220, 208, 218, 224, 198, 228]
-                }
+                  data: [230, 185, 220, 226, 189, 220, 208, 218, 224, 198, 228],
+                },
               ]}
             />
           </Grid>
-          
         </Grid>
       </Container>
     </Page>

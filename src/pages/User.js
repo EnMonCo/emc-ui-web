@@ -2,9 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Box, Card, CircularProgress, Container, Stack, Typography } from '@mui/material';
 import superagent from 'superagent';
+import { sentenceCase } from 'change-case';
 import Page from '../components/Page';
 import { EMC_ACCOUNTS_V1 } from '../config';
 import useAuth from '../hooks/useAuth';
+import UserMetersTable from '../components/UserMetersTable';
+import Label from '../components/Label';
+import Iconify from '../components/Iconify';
 
 export default function User() {
   const { id } = useParams();
@@ -31,34 +35,77 @@ export default function User() {
 
   const title = user ? `${user.firstName} ${user.lastName}` : 'Loading...';
 
+  if (!user) {
+    return (
+      <Page title={title}>
+        <Container>
+          <CircularProgress />
+        </Container>
+      </Page>
+    );
+  }
+
   return (
     <Page title={title}>
       <Container>
         <Card>
-          {user ? (
-            <Stack direction="row" spacing={4} padding="3rem">
-              <Avatar
-                variant="circular"
-                sx={{ height: '225px', width: '225px' }}
-                src={user.photo || '/static/mock-images/avatars/avatar_default.jpg'}
-              />
-              <Box>
-                <Typography variant="h5" gutterBottom>
-                  {user.firstName} {user.lastName} | EMC Profile
+          <Stack direction="row" spacing={4} padding="3rem">
+            <Avatar
+              variant="circular"
+              sx={{ height: '225px', width: '225px' }}
+              src={user.photo || '/static/mock-images/avatars/avatar_default.jpg'}
+            />
+            <Box>
+              <Stack direction="row" spacing={1} mb={1}>
+                {user.id === admin.id && (
+                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    (you)
+                  </Typography>
+                )}
+                <Typography variant="h5">
+                  {user.firstName} {user.lastName}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
-                  {user.email}
-                </Typography>
+              </Stack>
 
-                <Typography variant="body1" gutterBottom>
-                  Registered {new Date(user.createdAt).format('MMMM Do, YYYY')}
-                </Typography>
-              </Box>
-            </Stack>
-          ) : (
-            <CircularProgress />
-          )}
+              <Stack direction="row" spacing={1} mb={1}>
+                <Iconify icon="eva:email-outline" width={22} height={22} />
+                <Typography variant="body1">{user.email}</Typography>
+              </Stack>
+
+              <Stack direction="row" spacing={1} mb={1}>
+                <Iconify icon="eva:phone-outline" width={22} height={22} />
+                <Typography variant="body1">Status:</Typography>
+                <Label variant="ghost" color={(user.status.id === 2 && 'error') || 'success'}>
+                  {sentenceCase(user.status.name)}
+                </Label>
+              </Stack>
+
+              <Stack direction="row" spacing={1} mb={1}>
+                <Iconify icon="eva:email-outline" width={22} height={22} />
+                <Typography variant="body1">Role: </Typography>
+                <Label variant="ghost" color={(user.role.id === 2 && 'info') || 'success'}>
+                  {sentenceCase(user.role.name)}
+                </Label>
+              </Stack>
+
+              <Stack direction="row" spacing={1} mb={1}>
+                <Iconify icon="eva:calendar-outline" width={22} height={22} />
+                <Typography variant="body1">Registered at {new Date(user.createdAt).toLocaleString()}</Typography>
+              </Stack>
+            </Box>
+          </Stack>
         </Card>
+      </Container>
+
+      <Box sx={{ m: 3 }} />
+
+      <Container>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2} mt={4}>
+          <Typography variant="h4" gutterBottom>
+            Meters
+          </Typography>
+        </Stack>
+        <UserMetersTable forUserId={user.id} />
       </Container>
     </Page>
   );

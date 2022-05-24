@@ -14,7 +14,7 @@ const navConfig = [
   {
     title: 'meters',
     path: '/dashboard/meters',
-    icon: getIcon('eva:people-fill'),
+    icon: getIcon('eva:flash-fill'),
   },
   {
     title: 'login',
