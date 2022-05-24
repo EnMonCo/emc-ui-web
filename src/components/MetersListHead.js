@@ -16,7 +16,7 @@ const visuallyHidden = {
   clip: 'rect(0 0 0 0)',
 };
 
-CustomListHead.propTypes = {
+MetersListHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
   rowCount: PropTypes.number,
@@ -26,7 +26,7 @@ CustomListHead.propTypes = {
   onSelectAllClick: PropTypes.func,
 };
 
-export default function CustomListHead({
+export default function MetersListHead({
                                        order,
                                        orderBy,
                                        rowCount,

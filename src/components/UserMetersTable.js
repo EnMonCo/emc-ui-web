@@ -7,24 +7,27 @@ import {
   Card,
   Checkbox,
   CircularProgress,
+  IconButton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TablePagination,
   TableRow,
+  TextField,
 } from '@mui/material';
 // components
 import { sentenceCase } from 'change-case';
 import Scrollbar from './Scrollbar';
 import SearchNotFound from './SearchNotFound';
-import CustomListHead from './CustomListHead';
-import CustomListToolbar from './CustomListToolbar';
-import CustomMoreMenu from './CustomMoreMenu';
+import MetersListHead from './MetersListHead';
+import MetersListToolbar from './MetersListToolbar';
+import MetersMoreMenu from './MetersMoreMenu';
 
 import { EMC_METERS_V1 } from '../config';
 import useAuth from '../hooks/useAuth';
 import Label from './Label';
+import Iconify from './Iconify';
 
 // ----------------------------------------------------------------------
 
@@ -84,6 +87,8 @@ export default function UserMetersTable({ forUserId }) {
   const [total, setTotal] = useState(0);
 
   const [loading, setLoading] = useState(false);
+
+  const [editing, setEditing] = useState({});
 
   const { getUser } = useAuth();
 
@@ -154,6 +159,49 @@ export default function UserMetersTable({ forUserId }) {
     setFilterName(event.target.value);
   };
 
+  const handleEditClickWithMeter =
+    (editingMeter) =>
+    ({ setIsOpen }) => {
+      setEditing({ [editingMeter.id]: editingMeter.name || '' });
+      setIsOpen(false);
+    };
+
+  const handleConfirmEditClick = (editingMeter) => {
+    const newName = editing[editingMeter.id];
+    superagent
+      .patch(`${EMC_METERS_V1}/users/${targetUserId}/meters/${editingMeter.id}`)
+      .set('Authorization', `Bearer ${user.bearerToken}`)
+      .send({
+        name: newName,
+      })
+      .then(() => {
+        setMeters(
+          meters.map((meter) => {
+            if (meter.id === editingMeter.id) {
+              return { ...meter, name: newName };
+            }
+            return meter;
+          })
+        );
+        setEditing((prevEditing) => {
+          const newEditing = { ...prevEditing };
+          delete newEditing[editingMeter.id];
+          return newEditing;
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  function handleNameChange(id, event) {
+    let name = event.target.value;
+    if (name.length > 50) {
+      name = name.slice(0, 50);
+    }
+    setEditing((prev) => ({ ...prev, [id]: name }));
+  }
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - meters.length) : 0;
 
   const filteredMeters = applySortFilter(meters, getComparator(order, orderBy), filterName);
@@ -162,7 +210,7 @@ export default function UserMetersTable({ forUserId }) {
 
   return (
     <Card>
-      <CustomListToolbar
+      <MetersListToolbar
         numSelected={selected.length}
         filterName={filterName}
         onFilterName={handleFilterByName}
@@ -172,7 +220,7 @@ export default function UserMetersTable({ forUserId }) {
       <Scrollbar>
         <TableContainer sx={{ minWidth: 800 }}>
           <Table>
-            <CustomListHead
+            <MetersListHead
               order={order}
               orderBy={orderBy}
               headLabel={TABLE_HEAD}
@@ -205,7 +253,19 @@ export default function UserMetersTable({ forUserId }) {
                       <TableCell padding="checkbox">
                         <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, id)} />
                       </TableCell>
-                      <TableCell align="left">{name}</TableCell>
+                      <TableCell align="left" >
+                        {Object.prototype.hasOwnProperty.call(editing, id) ? (
+                          <TextField
+                            // label="Name"
+                            variant="outlined"
+                            size="small"
+                            value={editing[id] || ''}
+                            onChange={(event) => handleNameChange(id, event)}
+                          />
+                        ) : (
+                          name
+                        )}
+                      </TableCell>
                       <TableCell align="left">{serialNumber}</TableCell>
                       <TableCell align="left">
                         <Label variant="ghost" color={(status.id === 2 && 'error') || 'success'}>
@@ -214,7 +274,13 @@ export default function UserMetersTable({ forUserId }) {
                       </TableCell>
 
                       <TableCell align="right">
-                        <CustomMoreMenu />
+                        {Object.prototype.hasOwnProperty.call(editing, id) ? (
+                          <IconButton onClick={() => handleConfirmEditClick(row)}>
+                            <Iconify icon="eva:checkmark-fill" width={20} height={20} />
+                          </IconButton>
+                        ) : (
+                          <MetersMoreMenu onEditClick={handleEditClickWithMeter(row)} />
+                        )}
                       </TableCell>
                     </TableRow>
                   );

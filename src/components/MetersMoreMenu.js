@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 // component
+import PropTypes from 'prop-types';
 import Iconify from './Iconify';
 
 // ----------------------------------------------------------------------
 
-export default function CustomMoreMenu() {
+export default function MetersMoreMenu({ onEditClick }) {
   const ref = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,7 +27,7 @@ export default function CustomMoreMenu() {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem component={RouterLink} to="#" sx={{ color: 'text.secondary' }}>
+        <MenuItem onClick={() => onEditClick({ setIsOpen })} sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
             <Iconify icon="eva:edit-fill" width={24} height={24} />
           </ListItemIcon>
@@ -44,3 +44,7 @@ export default function CustomMoreMenu() {
     </>
   );
 }
+
+MetersMoreMenu.propTypes = {
+  onEditClick: PropTypes.func.isRequired,
+};

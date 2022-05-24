@@ -29,14 +29,14 @@ const SearchStyle = styled(OutlinedInput)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-CustomListToolbar.propTypes = {
+MetersListToolbar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
   placeholder: PropTypes.string
 };
 
-export default function CustomListToolbar({ numSelected, filterName, onFilterName, placeholder}) {
+export default function MetersListToolbar({ numSelected, filterName, onFilterName, placeholder}) {
   return (
     <RootStyle
       sx={{
