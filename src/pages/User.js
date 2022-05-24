@@ -56,7 +56,7 @@ export default function User() {
               src={user.photo || '/static/mock-images/avatars/avatar_default.jpg'}
             />
             <Box>
-              <Stack direction="row" spacing={1} mb={1}>
+              <Stack direction="row" spacing={1} mb={2}>
                 {user.id === admin.id && (
                   <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                     (you)
@@ -67,28 +67,28 @@ export default function User() {
                 </Typography>
               </Stack>
 
-              <Stack direction="row" spacing={1} mb={1}>
+              <Stack direction="row" spacing={1} mb={1} alignItems='center'>
                 <Iconify icon="eva:email-outline" width={22} height={22} />
                 <Typography variant="body1">{user.email}</Typography>
               </Stack>
 
-              <Stack direction="row" spacing={1} mb={1}>
-                <Iconify icon="eva:phone-outline" width={22} height={22} />
+              <Stack direction="row" spacing={1} mb={1} alignItems='center'>
+                <Iconify icon="eva:info-outline" width={22} height={22} />
                 <Typography variant="body1">Status:</Typography>
                 <Label variant="ghost" color={(user.status.id === 2 && 'error') || 'success'}>
                   {sentenceCase(user.status.name)}
                 </Label>
               </Stack>
 
-              <Stack direction="row" spacing={1} mb={1}>
-                <Iconify icon="eva:email-outline" width={22} height={22} />
+              <Stack direction="row" spacing={1} mb={1} alignItems='center'>
+                <Iconify icon="eva:person-outline" width={22} height={22} />
                 <Typography variant="body1">Role: </Typography>
                 <Label variant="ghost" color={(user.role.id === 2 && 'info') || 'success'}>
                   {sentenceCase(user.role.name)}
                 </Label>
               </Stack>
 
-              <Stack direction="row" spacing={1} mb={1}>
+              <Stack direction="row" spacing={1} mb={1} alignItems='center'>
                 <Iconify icon="eva:calendar-outline" width={22} height={22} />
                 <Typography variant="body1">Registered at {new Date(user.createdAt).toLocaleString()}</Typography>
               </Stack>
