@@ -95,11 +95,12 @@ export default function Users() {
 
   useEffect(() => {
     setLoading(true);
+    const limit = rowsPerPage === -1 ? 0 : rowsPerPage;
     superagent
       .get(`${EMC_ACCOUNTS_V1}/users`)
       .query({
         page: page + 1,
-        limit: rowsPerPage,
+        limit,
       })
       .set('Authorization', `Bearer ${admin.bearerToken}`)
       .then((res) => {
@@ -255,7 +256,16 @@ export default function Users() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            // rowsPerPageOptions={[5, 10, 25, 0]}
+            rowsPerPageOptions={[
+              { label: '5', value: 5 },
+              { label: '10', value: 10 },
+              {
+                label: '25',
+                value: 25,
+              },
+              { label: 'All', value: -1 },
+            ]}
             component="div"
             count={total}
             rowsPerPage={rowsPerPage}
