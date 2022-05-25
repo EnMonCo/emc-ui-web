@@ -10,6 +10,8 @@ import { AppWebsiteVisits, AppWidgetSummary } from '../sections/@dashboard/app';
 
 import { EMC_METERS_V1 } from '../config';
 import useAuth from '../hooks/useAuth';
+import AppVoltageUsage from '../sections/@dashboard/app/AppVoltageUsage';
+import AppPowerUsage from '../sections/@dashboard/app/AppPowerUsage';
 
 // ----------------------------------------------------------------------
 
@@ -23,6 +25,9 @@ export default function DashboardApp() {
   const [voltage, setVoltage] = useState(0.0);
   const [power, setPower] = useState(0.0);
   const [activeMeter, setActiveMeter] = useState(null);
+  const [voltageHistory, setVoltageHistory] = useState([]);
+  const [powerHistory, setPowerHistory] = useState([]);
+  const [meterTimestamps, setMeterTimestamps] = useState([]);
 
   const user = getUser();
 
@@ -70,6 +75,36 @@ export default function DashboardApp() {
     };
   }, [activeMeter]);
 
+  useEffect(() => {
+    const date = new Date();
+    if (activeMeter) {
+      superagent
+        .get(`${EMC_METERS_V1}/meters/${activeMeter.id}/data`)
+        .query({
+            from: 0,
+            to: date.getTime(),
+          }
+        )
+        .set('Authorization', `Bearer ${user.bearerToken}`)
+        .then((res) => {
+          const voltages = [];
+          const powers = [];
+          const timestamps = [];
+          res.body.forEach((item) => {
+            voltages.push(item.voltage.toFixed(2));
+            powers.push(item.power.toFixed(2));
+            timestamps.push(item.timestamp);
+          });
+          setVoltageHistory(voltages);
+          setPowerHistory(powers);
+          setMeterTimestamps(timestamps);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, [user, activeMeter]);
+
   return (
     <Page title="Dashboard">
       <Container maxWidth="xl">
@@ -97,57 +132,34 @@ export default function DashboardApp() {
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>
-            <AppWebsiteVisits
-              title="Voltage"
+            <AppPowerUsage
+              title="Power"
               subheader=""
-              chartLabels={[
-                '2022-05-20T16:56:53.860Z',
-                '2022-05-20T16:57:54.886Z',
-                '2022-05-20T16:58:55.799Z',
-                '2022-05-20T16:59:56.850Z',
-                '2022-05-20T17:00:58.126Z',
-                '2022-05-20T17:01:58.863Z',
-                '2022-05-20T17:02:59.854Z',
-                '2022-05-20T17:04:00.751Z',
-                '2022-05-20T17:05:01.906Z',
-                '2022-05-20T17:06:02.849Z',
-                '2022-05-20T17:07:03.796Z',
-              ]}
+              chartLabels={meterTimestamps}
               chartData={[
                 {
-                  name: 'voltage',
+                  name: 'power',
                   type: 'area',
                   fill: 'gradient',
-                  data: [230, 185, 220, 226, 189, 220, 208, 218, 224, 198, 228],
+                  data: powerHistory,
                 },
               ]}
             />
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>
-            <AppWebsiteVisits
+            <AppVoltageUsage
               title="Voltage"
               subheader=""
-              chartLabels={[
-                '2022-05-20T16:56:53.860Z',
-                '2022-05-20T16:57:54.886Z',
-                '2022-05-20T16:58:55.799Z',
-                '2022-05-20T16:59:56.850Z',
-                '2022-05-20T17:00:58.126Z',
-                '2022-05-20T17:01:58.863Z',
-                '2022-05-20T17:02:59.854Z',
-                '2022-05-20T17:04:00.751Z',
-                '2022-05-20T17:05:01.906Z',
-                '2022-05-20T17:06:02.849Z',
-                '2022-05-20T17:07:03.796Z',
-              ]}
+              chartLabels={meterTimestamps}
               chartData={[
                 {
                   name: 'voltage',
                   type: 'area',
                   fill: 'gradient',
-                  data: [230, 185, 220, 226, 189, 220, 208, 218, 224, 198, 228],
-                },
+                  color: theme.palette.chart.yellow[0],
+                  data: voltageHistory,
+                }
               ]}
             />
           </Grid>
