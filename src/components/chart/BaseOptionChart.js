@@ -91,7 +91,7 @@ export default function BaseOptionChart() {
     // Chart
     chart: {
       toolbar: { show: false },
-      zoom: { enabled: false },
+      zoom: { enabled: true },
       // animations: { enabled: false },
       foreColor: theme.palette.text.disabled,
       fontFamily: theme.typography.fontFamily
