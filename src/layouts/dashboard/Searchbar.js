@@ -1,7 +1,7 @@
 import { useState } from 'react';
 // material
-import { styled, alpha } from '@mui/material/styles';
-import { Input, Slide, Button, IconButton, InputAdornment, ClickAwayListener } from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
+import { Button, ClickAwayListener, IconButton, Input, InputAdornment, Slide } from '@mui/material';
 // component
 import Iconify from '../../components/Iconify';
 
@@ -55,7 +55,6 @@ export default function Searchbar() {
         <Slide direction="down" in={isOpen} mountOnEnter unmountOnExit>
           <SearchbarStyle>
             <Input
-              autoFocus
               fullWidth
               disableUnderline
               placeholder="Search…"
