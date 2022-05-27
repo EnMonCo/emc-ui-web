@@ -7,7 +7,7 @@ import { Box, Button, CircularProgress, Container, Typography } from '@mui/mater
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
-import { EMC_ACCOUNTS_V1, EMC_METERS_V1 } from '../config';
+import { EMC_METERS_V1 } from '../config';
 import useAuth from '../hooks/useAuth';
 
 // ----------------------------------------------------------------------
@@ -29,7 +29,7 @@ export default function PairMeter() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { hash } = useParams();
-  const {getUser} = useAuth();
+  const { getUser } = useAuth();
 
   const user = getUser();
 

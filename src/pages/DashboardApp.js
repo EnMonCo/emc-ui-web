@@ -6,7 +6,7 @@ import { Container, Grid, Typography } from '@mui/material';
 // components
 import Page from '../components/Page';
 // sections
-import { AppWebsiteVisits, AppWidgetSummary } from '../sections/@dashboard/app';
+import { AppWidgetSummary } from '../sections/@dashboard/app';
 
 import { EMC_METERS_V1 } from '../config';
 import useAuth from '../hooks/useAuth';
@@ -81,10 +81,9 @@ export default function DashboardApp() {
       superagent
         .get(`${EMC_METERS_V1}/meters/${activeMeter.id}/data`)
         .query({
-            from: 0,
-            to: date.getTime(),
-          }
-        )
+          from: 0,
+          to: date.getTime(),
+        })
         .set('Authorization', `Bearer ${user.bearerToken}`)
         .then((res) => {
           const voltages = [];
@@ -159,7 +158,7 @@ export default function DashboardApp() {
                   fill: 'gradient',
                   color: theme.palette.chart.yellow[0],
                   data: voltageHistory,
-                }
+                },
               ]}
             />
           </Grid>
