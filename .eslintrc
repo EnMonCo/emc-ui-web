@@ -19,7 +19,14 @@
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
       "impliedStrict": true
+    },
+    "babelOptions": {
+      "presets": [
+        ["babel-preset-react-app", false],
+        "babel-preset-react-app/prod"
+      ]
     }
+
   },
   "rules": {
     "no-shadow": 0,
