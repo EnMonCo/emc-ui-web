@@ -31,6 +31,9 @@ jobs:
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "build" # Built app content directory - optional
+        env: # Add environment variables here
+          REACT_APP_BACKEND_URL: https://emc-api-gateway.azurewebsites.net
+          REACT_APP_URL: https://black-plant-0f670f510.3.azurestaticapps.net
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
