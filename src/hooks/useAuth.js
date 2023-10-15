@@ -55,7 +55,7 @@ export function AuthProvider(props) {
       setLoaded(true);
     }
 
-  }, [getUserFromLocalStorage]);
+  }, []);
 
   React.useEffect(() => {
     window.addEventListener("storage", changeStorage);

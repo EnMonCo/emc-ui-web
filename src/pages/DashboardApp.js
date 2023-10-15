@@ -73,7 +73,7 @@ export default function DashboardApp() {
     return () => {
       clearInterval(intervalHandle.current);
     };
-  }, [activeMeter, fetchMeterData]);
+  }, [activeMeter]);
 
   useEffect(() => {
     const date = new Date();
