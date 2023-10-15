@@ -76,13 +76,12 @@ export default function DashboardApp() {
   }, [activeMeter]);
 
   useEffect(() => {
-    const date = new Date();
     if (activeMeter) {
       superagent
         .get(`${EMC_METERS_V1}/meters/${activeMeter.id}/data`)
         .query({
           from: 0,
-          to: date.getTime(),
+          to: Date.now(),
         })
         .set('Authorization', `Bearer ${user.bearerToken}`)
         .then((res) => {
