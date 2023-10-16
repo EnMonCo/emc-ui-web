@@ -24,14 +24,15 @@ export default function AppPowerUsage({ title, subheader, chartLabels, chartData
     tooltip: {
       shared: true,
       intersect: false,
-      y: {
+      y:[ {
         formatter: (y) => {
           if (typeof y !== 'undefined') {
-            return `${y.toFixed(2)} kWh`;
+            return `${y.toFixed(2)} W/h`;
           }
           return y;
         },
-      },
+      }
+      ]
     },
   });
 

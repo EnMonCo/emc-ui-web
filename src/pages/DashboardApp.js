@@ -122,7 +122,7 @@ export default function DashboardApp() {
 
           <Grid item xs={12} sm={6} md={3}>
             <AppWidgetSummary
-              title="Power, kW/h"
+              title="Power, W/h"
               total={power}
               color={power > 0.5 ? 'error' : 'info'}
               icon={'eva:flash-outline'}
@@ -137,9 +137,16 @@ export default function DashboardApp() {
               chartData={[
                 {
                   name: 'power',
-                  type: 'area',
-                  fill: 'gradient',
+                  type: 'line',
+                  fill: 'solid',
                   data: powerHistory,
+                },
+                {
+                  name: 'predicted',
+                  type: 'line',
+                  fill: 'solid',
+                  data: voltageHistory,
+                  color: theme.palette.chart.green[0],
                 },
               ]}
             />
