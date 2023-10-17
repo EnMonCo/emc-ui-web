@@ -37,7 +37,7 @@ export default function AppPowerUsage({ title, subheader, fill, predictDataCount
       y: {
         formatter: (y, dataInfo) => {
           if (typeof y !== 'undefined') {
-            if (dataInfo.dataPointIndex <= waveletLastIdx) {
+            if (waveletLastIdx !== -1 && dataInfo.dataPointIndex <= waveletLastIdx) {
               return `${y.toFixed(2)} W/h (wavelet reconstructed)`;
             }
             return `${y.toFixed(2)} W/h`;
