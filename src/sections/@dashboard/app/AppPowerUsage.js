@@ -15,24 +15,30 @@ AppPowerUsage.propTypes = {
   chartLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default function AppPowerUsage({ title, subheader, chartLabels, chartData, ...other }) {
+export default function AppPowerUsage({ title, subheader, fill, predictDataCount, chartLabels, chartData, ...other }) {
+  // console.log(chartData);
+  // console.log(chartLabels);
   const chartOptions = merge(BaseOptionChart(), {
     plotOptions: { bar: { columnWidth: '16%' } },
-    fill: { type: chartData.map((i) => i.fill) },
+    fill,
+    forecastDataPoints: {
+      count: predictDataCount,
+    },
     labels: chartLabels,
-    xaxis: { type: 'datetime' },
+    xaxis: {
+      type: 'datetime',
+    },
     tooltip: {
       shared: true,
       intersect: false,
-      y:[ {
+      y: {
         formatter: (y) => {
           if (typeof y !== 'undefined') {
             return `${y.toFixed(2)} W/h`;
           }
           return y;
         },
-      }
-      ]
+      },
     },
   });
 
@@ -40,9 +46,9 @@ export default function AppPowerUsage({ title, subheader, chartLabels, chartData
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
 
-      <Box sx={{ p: 3, pb: 1 }} dir="ltr">
-        <ReactApexChart type="line" series={chartData} options={chartOptions} height={364} />
-      </Box>
+      {/*<Box sx={{ p: 3, pb: 1 }} dir='ltr'>*/}
+        <ReactApexChart type='line' series={chartData} options={chartOptions} height={364} />
+      {/*</Box>*/}
     </Card>
   );
 }
