@@ -128,7 +128,7 @@ export default function DashboardApp() {
 
     return () => {
       waveletLastIdxRef.current = -1;
-    }
+    };
   }, [user, activeMeter]);
 
   // get predict data
@@ -180,6 +180,27 @@ export default function DashboardApp() {
     const meter = meters.find((item) => item.id === meterId);
     setActiveMeter(meter);
   };
+
+  if (!activeMeter) {
+    return (
+      <Page title='Dashboard' sx={{height: '100%'}}>
+        <Container maxWidth='xl' sx={{height: '100%'}}>
+          <Typography variant='h4' sx={{ mb: 5 }}>
+            Hi, Welcome back
+          </Typography>
+
+          <Grid container sx={{ justifyContent: 'center', alignContent: 'center', height: '100%' }} spacing={3}>
+            <Grid item xs={12} sm={12} md={12}>
+              <Typography variant='h2' sx={{ mb: 10 }}>
+                Please pair a meter with your account to continue
+              </Typography>
+            </Grid>
+          </Grid>
+
+        </Container>
+      </Page>
+    );
+  }
 
   return (
     <Page title='Dashboard'>
