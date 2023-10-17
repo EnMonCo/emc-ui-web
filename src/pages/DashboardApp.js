@@ -2,7 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import superagent from 'superagent';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Box, Container, Grid, Input, Slider, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  FormControl,
+  Grid,
+  Input,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  Typography,
+} from '@mui/material';
 // components
 import Page from '../components/Page';
 // sections
@@ -14,6 +25,8 @@ import AppVoltageUsage from '../sections/@dashboard/app/AppVoltageUsage';
 import AppPowerUsage from '../sections/@dashboard/app/AppPowerUsage';
 
 // ----------------------------------------------------------------------
+
+const MAX_PREDICT_COUNT = 3 * 24;
 
 export default function DashboardApp() {
   const theme = useTheme();
@@ -31,23 +44,9 @@ export default function DashboardApp() {
   const [predictData, setPredictData] = useState([]);
   const [meterTimestamps, setMeterTimestamps] = useState([]);
 
-  const user = getUser();
+  let waveletLastIdxRef = useRef(-1);
 
-  const fetchMeterData = (id) => {
-    if (id) {
-      return;
-    }
-    superagent
-      .get(`${EMC_METERS_V1}/meters/${id}/data/live`)
-      .set('Authorization', `Bearer ${user.bearerToken}`)
-      .then((res) => {
-        setVoltage(res.body[0].voltage);
-        setPower(res.body[0].power);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
+  const user = getUser();
 
   useEffect(() => {
     superagent
@@ -66,22 +65,38 @@ export default function DashboardApp() {
   const intervalHandle = useRef(null);
 
   useEffect(() => {
+    const fetchMeterData = (id) => {
+      if (!id) {
+        return;
+      }
+      superagent
+        .get(`${EMC_METERS_V1}/meters/${id}/data/live`)
+        .set('Authorization', `Bearer ${user.bearerToken}`)
+        .then((res) => {
+          setVoltage(res.body[0].voltage);
+          setPower(res.body[0].power);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+
     if (activeMeter) {
       console.log('set interval');
       fetchMeterData(activeMeter.id);
       intervalHandle.current = setInterval(() => {
         fetchMeterData(activeMeter.id);
-      }, 1000 * 10);
+      }, 1000 * 3);
     }
 
     return () => {
       clearInterval(intervalHandle.current);
     };
-  }, [activeMeter]);
+  }, [user, activeMeter]);
 
   useEffect(() => {
     if (!activeMeter) {
-      return;
+      return {};
     }
     superagent
       .get(`${EMC_METERS_V1}/meters/${activeMeter.id}/data`)
@@ -94,10 +109,14 @@ export default function DashboardApp() {
         const voltages = [];
         const powers = [];
         const timestamps = [];
-        res.body.forEach((item) => {
+        res.body.forEach((item, idx) => {
           voltages.push(item.voltage.toFixed(2));
           powers.push(item.power.toFixed(2));
           timestamps.push(item.timestamp);
+
+          if (item['__entity'] === 'ShortTermData' && waveletLastIdxRef.current < 0) {
+            waveletLastIdxRef.current = idx - 1;
+          }
         });
         setVoltageHistory(voltages);
         setPowerHistory(powers);
@@ -106,6 +125,10 @@ export default function DashboardApp() {
       .catch((err) => {
         console.error(err);
       });
+
+    return () => {
+      waveletLastIdxRef.current = -1;
+    }
   }, [user, activeMeter]);
 
   // get predict data
@@ -131,6 +154,8 @@ export default function DashboardApp() {
       })
       .catch((err) => {
         console.error(err);
+        setPredictCount(0);
+        setPredictData([]);
       });
   }, [user, activeMeter, powerHistory, predictCount]);
 
@@ -141,8 +166,8 @@ export default function DashboardApp() {
   const handleBlur = () => {
     if (predictCount < 0) {
       setPredictCount(0);
-    } else if (predictCount > 60 * 24) {
-      setPredictCount(60 * 24);
+    } else if (predictCount > MAX_PREDICT_COUNT) {
+      setPredictCount(MAX_PREDICT_COUNT);
     }
   };
 
@@ -150,12 +175,39 @@ export default function DashboardApp() {
     setPredictCount(event.target.value === '' ? 0 : Number(event.target.value));
   };
 
+  const handleMeterChange = (event) => {
+    const meterId = event.target.value;
+    const meter = meters.find((item) => item.id === meterId);
+    setActiveMeter(meter);
+  };
+
   return (
     <Page title='Dashboard'>
       <Container maxWidth='xl'>
-        <Typography variant='h4' sx={{ mb: 5 }}>
-          Hi, Welcome back
-        </Typography>
+        <Grid container sx={{ justifyContent: 'space-between' }} spacing={3}>
+          <Grid item xs={12} sm={6} md={6}>
+            <Typography variant='h4' sx={{ mb: 5 }}>
+              Hi, Welcome back
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={3} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Meter</InputLabel>
+              <Select
+                labelId='select-meter'
+                value={activeMeter ? activeMeter.id : ''}
+                label='Meter'
+                onChange={handleMeterChange}
+              >
+                {
+                  meters.map((meter) => (
+                    <MenuItem key={meter.id} value={meter.id}>{meter.name || meter.serialNumber}</MenuItem>
+                  ))
+                }
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
@@ -171,7 +223,7 @@ export default function DashboardApp() {
             <AppWidgetSummary
               title='Power, W/h'
               total={power}
-              color={power > 0.5 ? 'error' : 'info'}
+              color={power > 200 ? 'error' : 'info'}
               icon={'eva:flash-outline'}
             />
           </Grid>
@@ -184,15 +236,33 @@ export default function DashboardApp() {
                 type: 'gradient',
                 gradient: {
                   shade: 'dark',
-                  gradientToColors: ['#d11336', '#46d113'],
+                  // gradientToColors: ['#d11336', '#46d113'],
                   shadeIntensity: 1,
                   type: 'vertical',
                   opacityFrom: 1,
                   opacityTo: 1,
-                  stops: [0, 50, 100],
+                  // stops: [0, 1, 2],
+                  colorStops: [
+                    {
+                      offset: 10,
+                      color: '#fc440b',
+                      opacity: 1,
+                    },
+                    {
+                      offset: 55,
+                      color: '#46d113',
+                      opacity: 1,
+                    },
+                    {
+                      offset: 90,
+                      color: '#2065D1',
+                      opacity: 1,
+                    },
+                  ],
                 },
               }}
               predictDataCount={predictCount - 1}
+              waveletLastIdx={waveletLastIdxRef.current}
               chartLabels={[...meterTimestamps, ...predictData.map((item) => item.timestamp)]}
               chartData={[
                 {
@@ -216,7 +286,7 @@ export default function DashboardApp() {
                     value={predictCount}
                     min={0}
                     step={1}
-                    max={60 * 24}
+                    max={MAX_PREDICT_COUNT}
                     onChange={handlePredictCountChange}
                   />
                 </Grid>
@@ -228,7 +298,7 @@ export default function DashboardApp() {
                     onBlur={handleBlur}
                     inputProps={{
                       min: 0,
-                      max: 60 * 24,
+                      max: MAX_PREDICT_COUNT,
                       type: 'number',
                       'aria-labelledby': 'input-slider',
                     }}
