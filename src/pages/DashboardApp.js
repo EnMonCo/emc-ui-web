@@ -55,6 +55,9 @@ export default function DashboardApp() {
       .get(`${EMC_METERS_V1}/users/${user.id}/meters`)
       .set('Authorization', `Bearer ${user.bearerToken}`)
       .then((res) => {
+        if (res.body.length === 0) {
+          return;
+        }
         setMeters(res.body.data);
         setActiveMeter(res.body.data[0]);
         setLoadingMeters(false);
@@ -76,6 +79,9 @@ export default function DashboardApp() {
         .get(`${EMC_METERS_V1}/meters/${id}/data/live`)
         .set('Authorization', `Bearer ${user.bearerToken}`)
         .then((res) => {
+          if (res.body.length === 0) {
+            return;
+          }
           setVoltage(res.body[0].voltage);
           setPower(res.body[0].power);
         })
