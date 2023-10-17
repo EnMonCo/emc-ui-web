@@ -3,7 +3,7 @@ import superagent from 'superagent';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import {
-  Box,
+  Box, CircularProgress,
   Container,
   FormControl,
   Grid,
@@ -43,18 +43,21 @@ export default function DashboardApp() {
   const [predictCount, setPredictCount] = useState(20);
   const [predictData, setPredictData] = useState([]);
   const [meterTimestamps, setMeterTimestamps] = useState([]);
+  const [loadingMeters, setLoadingMeters] = useState(true);
 
   let waveletLastIdxRef = useRef(-1);
 
   const user = getUser();
 
   useEffect(() => {
+    setLoadingMeters(true);
     superagent
       .get(`${EMC_METERS_V1}/users/${user.id}/meters`)
       .set('Authorization', `Bearer ${user.bearerToken}`)
       .then((res) => {
         setMeters(res.body.data);
         setActiveMeter(res.body.data[0]);
+        setLoadingMeters(false);
       })
       .catch((err) => {
         console.error(err);
@@ -181,10 +184,41 @@ export default function DashboardApp() {
     setActiveMeter(meter);
   };
 
+  if (loadingMeters) {
+    return (
+      <Page title='Dashboard' sx={{ height: '100%' }}>
+        <Container maxWidth='xl' sx={{ height: '100%' }}>
+          <Typography variant='h4' sx={{ mb: 5 }}>
+            Hi, Welcome back
+          </Typography>
+
+          <Grid
+            container
+            direction='column'
+            alignItems='center'
+            justifyContent='center'
+            spacing={3}
+            sx={{ height: '100%' }}
+          >
+            <Grid item>
+              <CircularProgress size={100} />
+            </Grid>
+            <Grid item>
+              <Typography variant='h2'>
+                Loading meters...
+              </Typography>
+            </Grid>
+          </Grid>
+
+        </Container>
+      </Page>
+    );
+  }
+
   if (!activeMeter) {
     return (
-      <Page title='Dashboard' sx={{height: '100%'}}>
-        <Container maxWidth='xl' sx={{height: '100%'}}>
+      <Page title='Dashboard' sx={{ height: '100%' }}>
+        <Container maxWidth='xl' sx={{ height: '100%' }}>
           <Typography variant='h4' sx={{ mb: 5 }}>
             Hi, Welcome back
           </Typography>
