@@ -26,7 +26,7 @@ import AppPowerUsage from '../sections/@dashboard/app/AppPowerUsage';
 
 // ----------------------------------------------------------------------
 
-const MAX_PREDICT_COUNT = 3 * 24;
+const MAX_PREDICT_COUNT = 3 * 60;
 
 export default function DashboardApp() {
   const theme = useTheme();
